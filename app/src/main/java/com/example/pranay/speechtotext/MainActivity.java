@@ -46,11 +46,14 @@ public class MainActivity extends AppCompatActivity {
                 switch (motionEvent.getAction())
                 {
                     case MotionEvent.ACTION_UP:
+                        mSpeechRecognizer.stopListening();
                         mEditText.setHint("you will see the input");
                         break;
 
                     case MotionEvent.ACTION_DOWN:
+                        mEditText.setText("");
                         mEditText.setHint("Listening");
+                        mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                 }
 
                 return false;
