@@ -8,18 +8,23 @@ import android.os.Build;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
+    View mView;
     EditText mEditText;
     Button mButton;
     SpeechRecognizer mSpeechRecognizer;
@@ -37,9 +42,10 @@ public class MainActivity extends AppCompatActivity {
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 
-        mEditText=(EditText)findViewById(R.id.editText);
+        mEditText= findViewById(R.id.editText);
+        mView = findViewById(R.id.editText);
 
-        mEditText.setOnTouchListener(new View.OnTouchListener() {
+        mView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
@@ -61,16 +67,41 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
     }
     private void checkPermission()
     {
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
         {
-            if(!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)== PackageManager.PERMISSION_GRANTED))
-            {
-                Intent intent=new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package" + getPackageName()));
-                startActivity(intent);
-                finish();
+//            if(!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)== PackageManager.PERMISSION_GRANTED))
+//            {
+//                Intent intent=new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package" + getPackageName()));
+//                startActivity(intent);
+//                finish();
+//            }
+
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted
+                } else {
+
+                    // permission denied
+                    Toast.makeText(MainActivity.this, "Permission denied for Microphone", Toast.LENGTH_SHORT).show();
+                }
+                return;
             }
         }
     }
